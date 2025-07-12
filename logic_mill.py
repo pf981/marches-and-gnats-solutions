@@ -49,7 +49,19 @@ def parse_transition_rules(transition_rules_str: str) -> list[TransitionType]:
                 continue
             values.append(val)
 
-        transitions_list.append(tuple(values))
+        if len(values) != 5:
+            raise ValueError(
+                f"Expected 5 values per transition rule, got {len(values)}: {values}"
+            )
+
+        transition: TransitionType = (
+            values[0],
+            values[1],
+            values[2],
+            values[3],
+            values[4],
+        )
+        transitions_list.append(transition)
     return transitions_list
 
 
