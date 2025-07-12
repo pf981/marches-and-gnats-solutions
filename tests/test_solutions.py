@@ -44,22 +44,33 @@ def r(request: pytest.FixtureRequest) -> typing.Callable[[str], str]:
     return run
 
 
-def to_s(num: int) -> str:
+def tally(num: int) -> str:
     return "|" * num
+
+
+def to_bin(num: int) -> str:
+    return bin(num)[2:]
 
 
 def test_solution1(r):
     assert r("|||+||||") == "|||||||"
     for lhs in range(1, 10):
         for rhs in range(1, 10):
-            input = f"{to_s(lhs)}+{to_s(rhs)}"
-            assert r(input) == to_s(lhs + rhs)
+            input = f"{tally(lhs)}+{tally(rhs)}"
+            assert r(input) == tally(lhs + rhs)
 
 
 def test_solution2(r):
     assert r("|||||||") == "O"
     assert r("||||||") == "E"
     for num in range(1, 10):
-        assert r(to_s(num)) == "EO"[num % 2], (
+        assert r(tally(num)) == "EO"[num % 2], (
             f"Expect {num} is {['even', 'odd'][num % 2]}"
         )
+
+
+def test_solution3(r):
+    assert r("1010") == "1011"
+    assert r("0") == "1"
+    for num in range(1, 10):
+        assert r(to_bin(num)) == to_bin(num + 1)
