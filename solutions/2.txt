@@ -1,0 +1,5 @@
+INIT | ODD _ R
+ODD | EVEN _ R
+EVEN | ODD _ R
+ODD _ HALT O R
+EVEN _ HALT E R

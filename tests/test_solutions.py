@@ -56,6 +56,10 @@ def test_solution1(r):
             assert r(input) == to_s(lhs + rhs)
 
 
-# def test_solution2():
-#     r = get_runner(2)
-#     assert r("|||||||") == "||||||"
+def test_solution2(r):
+    assert r("|||||||") == "O"
+    assert r("||||||") == "E"
+    for num in range(1, 10):
+        assert r(to_s(num)) == "EO"[num % 2], (
+            f"Expect {num} is {['even', 'odd'][num % 2]}"
+        )
