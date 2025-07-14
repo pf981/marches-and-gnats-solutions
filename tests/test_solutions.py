@@ -49,11 +49,6 @@ def tally(num: int) -> str:
     return "|" * num
 
 
-def untally(s: str) -> str:
-    assert all(c == "|" for c in s.strip("_"))
-    return s.count("|")
-
-
 def to_bin(num: int) -> str:
     return bin(num)[2:]
 
