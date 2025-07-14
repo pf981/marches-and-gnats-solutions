@@ -2,7 +2,7 @@
 
 Solutions to the [Marches and Gnats](https://mng.quest/) puzzles.
 
-- Language: Python 3.12
+- Language: Python 3.13
 - Package manager: [uv](https://github.com/astral-sh/uv)
 - Test runner: [pytest](https://pytest.org)
 
