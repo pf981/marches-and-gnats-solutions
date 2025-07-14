@@ -97,3 +97,11 @@ def test_solution5(r):
         rhs = ",".join(tally(num) for num in nums)
         for i in range(1, n + 1):
             assert r(f"{tally(i)}:{rhs}") == tally(nums[i - 1])
+
+
+def test_solution6(r):
+    assert r("|||||-||") == "|||"
+    assert r("||-||") == ""
+    for lhs in range(1, 10):
+        for rhs in range(1, lhs):
+            assert r(f"{tally(lhs)}-{tally(rhs)}") == tally(lhs - rhs)
