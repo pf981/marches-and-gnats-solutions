@@ -1,5 +1,3 @@
-import pathlib
-
 """
 Logic Mill implementation.
 
