@@ -303,11 +303,9 @@ class LogicMill:
 
 
 if __name__ == "__main__":
-    with open("solutions/7.txt", "r") as f:
+    with open("solutions/8.txt", "r") as f:
         transition_rules = parse_transition_rules(f.read())
     mill = LogicMill(transition_rules)
-    # result, steps = mill.run("||:||,|,||", verbose=True)
-    # result, steps = mill.run("wõta-wastu-mu-soow-ja-chillitse-toomemäel", verbose=True)
-    result, steps = mill.run("jdxcõövkp", verbose=True)
+    result, steps = mill.run("hello-world", verbose=True)
     print(f"Result: {result}")
     print(f"Steps: {steps}")

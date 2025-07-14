@@ -114,6 +114,19 @@ def test_solution7(r):
         == "[w]õta-[w]astu-mu-soo[w]-ja-[ch]illitse-toomemäel"
     )
     for n in range(1, 10):
-        lhs = "".join(random.choice("abcdefghijklmnopqrstuvwxyzäöõü") for _ in range(n))
+        lhs = "".join(
+            random.choice("-abcdefghijklmnopqrstuvwxyzäöõü") for _ in range(n)
+        )
         rhs = "".join({"w": "[w]", "ch": "[ch]"}.get(c, c) for c in lhs)
+        assert r(lhs) == rhs
+
+
+def test_solution8(r):
+    random.seed(0)
+    assert r("hello-world") == "dlrow-olleh"
+    for n in range(1, 10):
+        lhs = "".join(
+            random.choice("-abcdefghijklmnopqrstuvwxyzäöõü") for _ in range(n)
+        )
+        rhs = lhs[::-1]
         assert r(lhs) == rhs
