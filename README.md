@@ -14,3 +14,7 @@ Install uv from https://github.com/astral-sh/uv
 ```bash
 uv run pytest
 ```
+
+## Acknowledgements
+
+Includes `logic_mill.py` from [mng.quest](https://mng.quest/logic_mill.py), licensed under the MIT License.
