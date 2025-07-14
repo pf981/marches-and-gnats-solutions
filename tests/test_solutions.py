@@ -105,3 +105,15 @@ def test_solution6(r):
     for lhs in range(1, 10):
         for rhs in range(1, lhs):
             assert r(f"{tally(lhs)}-{tally(rhs)}") == tally(lhs - rhs)
+
+
+def test_solution7(r):
+    random.seed(0)
+    assert (
+        r("wõta-wastu-mu-soow-ja-chillitse-toomemäel")
+        == "[w]õta-[w]astu-mu-soo[w]-ja-[ch]illitse-toomemäel"
+    )
+    for n in range(1, 10):
+        lhs = "".join(random.choice("abcdefghijklmnopqrstuvwxyzäöõü") for _ in range(n))
+        rhs = "".join({"w": "[w]", "ch": "[ch]"}.get(c, c) for c in lhs)
+        assert r(lhs) == rhs
