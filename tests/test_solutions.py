@@ -1,6 +1,7 @@
 import logic_mill
 import pathlib
 import pytest
+import random
 import re
 import typing
 
@@ -48,6 +49,11 @@ def tally(num: int) -> str:
     return "|" * num
 
 
+def untally(s: str) -> str:
+    assert all(c == "|" for c in s.strip("_"))
+    return s.count("|")
+
+
 def to_bin(num: int) -> str:
     return bin(num)[2:]
 
@@ -81,3 +87,13 @@ def test_solution4(r):
     for lhs in range(1, 10):
         for rhs in range(1, 10):
             assert r(f"{tally(lhs)}*{tally(rhs)}") == tally(lhs * rhs)
+
+
+def test_solution5(r):
+    random.seed(0)
+    assert r("||:|||,|||||,||||||||,||||") == "|||||"
+    for n in range(1, 10):
+        nums = [random.randint(1, 10) for _ in range(n)]
+        rhs = ",".join(tally(num) for num in nums)
+        for i in range(1, n + 1):
+            assert r(f"{tally(i)}:{rhs}") == tally(nums[i - 1])

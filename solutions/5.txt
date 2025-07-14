@@ -1,0 +1,37 @@
+// ||:||,|,||
+// ^                           INIT
+INIT | ERASE _ R
+// _|:||,|,||
+//  ^                          ERASE
+ERASE | FIND_RHS _ R
+// __:||,|,||
+//   ^                         FIND_RHS
+FIND_RHS | FIND_RHS | R
+FIND_RHS : ERASE_TO_COMMA : R
+// __:||,|,||
+//    ^                        ERASE_TO_COMMA
+ERASE_TO_COMMA | ERASE_TO_COMMA _ R
+ERASE_TO_COMMA _ ERASE_TO_COMMA _ R
+// __:_|,|,||
+//     ^                       ERASE_TO_COMMA
+// __:__,|,||
+//      ^                      ERASE_TO_COMMA
+// __:___|,||
+//     ^                       FIND_LHS
+ERASE_TO_COMMA , FIND_LHS _ L
+FIND_LHS _ FIND_LHS _ L
+FIND_LHS : FIND_START : L
+FIND_LHS | FIND_START | L
+FIND_START | FIND_START | L
+FIND_START _ ERASE _ R
+
+// Find comma, then erase everything
+ERASE : FIND_PIPE _ R
+FIND_PIPE _ FIND_PIPE _ R
+FIND_PIPE | FIND_COMMA | R
+FIND_COMMA _ HALT _ R
+FIND_COMMA | FIND_COMMA | R
+FIND_COMMA , ERASE_REST _ R
+ERASE_REST | ERASE_REST _ R
+ERASE_REST , ERASE_REST _ R
+ERASE_REST _ HALT _ R
