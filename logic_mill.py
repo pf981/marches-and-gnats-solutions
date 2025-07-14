@@ -1,3 +1,5 @@
+import pathlib
+
 """
 Logic Mill implementation.
 
@@ -301,14 +303,18 @@ class LogicMill:
 
 
 if __name__ == "__main__":
-    transition_rules = parse_transition_rules(
-        """
-INIT | FIND | R
-FIND | FIND | R
-FIND _ HALT | R
-""",
-    )
+    #     transition_rules = parse_transition_rules(
+    #         """
+    # INIT | FIND | R
+    # FIND | FIND | R
+    # FIND _ HALT | R
+    # """,
+    #     )
+    with open("solutions/4.txt", "r") as f:
+        transition_rules = parse_transition_rules(f.read())
     mill = LogicMill(transition_rules)
-    result, steps = mill.run("||||", verbose=True)
+    # result, steps = mill.run("||*|||", verbose=True)
+    # result, steps = mill.run("||*||||", verbose=True)
+    result, steps = mill.run("|||*|", verbose=True)
     print(f"Result: {result}")
     print(f"Steps: {steps}")

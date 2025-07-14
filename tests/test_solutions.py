@@ -64,9 +64,9 @@ def test_solution2(r):
     assert r("|||||||") == "O"
     assert r("||||||") == "E"
     for num in range(1, 10):
-        assert r(tally(num)) == "EO"[num % 2], (
-            f"Expect {num} is {['even', 'odd'][num % 2]}"
-        )
+        assert (
+            r(tally(num)) == "EO"[num % 2]
+        ), f"Expect {num} is {['even', 'odd'][num % 2]}"
 
 
 def test_solution3(r):
@@ -74,3 +74,10 @@ def test_solution3(r):
     assert r("0") == "1"
     for num in range(1, 10):
         assert r(to_bin(num)) == to_bin(num + 1)
+
+
+def test_solution4(r):
+    assert r("||*|||") == "||||||"
+    for lhs in range(1, 10):
+        for rhs in range(1, 10):
+            assert r(f"{tally(lhs)}*{tally(rhs)}") == tally(lhs * rhs)

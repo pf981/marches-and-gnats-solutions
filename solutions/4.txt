@@ -1,0 +1,65 @@
+// ||*||
+// ^                INIT
+INIT | ERASE _ R
+// _|*||
+//  ^               ERASE
+ERASE | SEEK_RHS _ R
+// __*||
+//   ^              SEEK_RHS
+SEEK_RHS | SEEK_RHS | R
+SEEK_RHS * DUPE * R
+//    ^             DUPE
+// __*X|
+//     ^            APPEND_Y
+DUPE | APPEND_Y X R
+DUPE X DUPE X R
+//      ^           APPEND_Y
+APPEND_Y | APPEND_Y | R
+APPEND_Y Y APPEND_Y Y R
+APPEND_Y _ SEEK_NEXT Y L
+// __*X|Y
+//     ^            SEEK_NEXT
+SEEK_NEXT | SEEK_NEXT | L
+SEEK_NEXT Y SEEK_NEXT Y L
+//    ^             SEEK_NEXT
+SEEK_NEXT X DUPE X R
+//     ^            DUPE
+// __*XXY
+//      ^           APPEND_Y
+//       ^          APPEND_Y
+// __*XXYY
+//      ^           SEEK_NEXT
+// __*XXYY
+//     ^            SEEK_NEXT
+//      ^           DUPE
+DUPE Y DUPE Y R
+//       ^          DUPE
+//        ^         DUPE
+DUPE _ UNDO_Y _ L
+//       ^          UNDO_Y
+// __*XXY|
+//      ^           UNDO_Y
+UNDO_Y Y UNDO_Y | L
+// __*XX||
+//     ^            UNDO_Y
+UNDO_Y X SEEK_LHS X L
+// __*XX||
+//    ^             SEEK_LHS
+SEEK_LHS X SEEK_LHS X L
+//   ^              SEEK_LHS
+SEEK_LHS * SEEK_LHS * L
+SEEK_LHS | SEEK_LHS | L
+//  ^               SEEK_LHS
+SEEK_LHS _ ERASE _ R
+//   ^              ERASE
+ERASE * UNDO_X _ R
+// ___XX||
+//    ^             UNDO_X
+UNDO_X X UNDO_X | R
+// ___|X||
+//     ^            UNDO_X
+// ___||||
+//      ^           UNDO_X
+UNDO_X | UNDO_X | R
+//       ^          HALT
+UNDO_X _ HALT _ R
