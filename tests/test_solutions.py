@@ -125,3 +125,17 @@ def test_solution8(r):
         )
         rhs = lhs[::-1]
         assert r(lhs) == rhs
+
+
+def test_solution9(r):
+    assert r("|||,||||") == "|||<||||"
+    assert r("|||,|||") == "|||=|||"
+    for lhs in range(1, 10):
+        for rhs in range(1, 10):
+            if lhs < rhs:
+                op = "<"
+            elif lhs > rhs:
+                op = ">"
+            else:
+                op = "="
+            assert r(f"{tally(lhs)},{tally(rhs)}") == f"{tally(lhs)}{op}{tally(rhs)}"
