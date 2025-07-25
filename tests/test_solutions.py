@@ -139,3 +139,22 @@ def test_solution9(r):
             else:
                 op = "="
             assert r(f"{tally(lhs)},{tally(rhs)}") == f"{tally(lhs)}{op}{tally(rhs)}"
+
+
+def test_solution10(r):
+    random.seed(0)
+    assert r("hello+world+how-are-you") == "|||"
+    for n in range(1, 10):
+        words = []
+
+        for _ in range(n):
+            word_length = random.randint(1, 10)
+            word = "".join(
+                random.choice("-abcdefghijklmnopqrstuvwxyzäöõü")
+                for _ in range(word_length)
+            )
+            words.append(word)
+
+        lhs = "+".join(words)
+        rhs = tally(n)
+        assert r(lhs) == rhs
