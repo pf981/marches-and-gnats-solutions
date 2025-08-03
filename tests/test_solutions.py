@@ -161,7 +161,6 @@ def test_solution10(r):
 
 
 def test_solution11(r):
-    random.seed(0)
     assert r("13") == "14"
     for num in range(1, 1000):
         assert r(str(num)) == str(num + 1)
