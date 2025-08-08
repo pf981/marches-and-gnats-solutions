@@ -164,3 +164,28 @@ def test_solution11(r):
     assert r("13") == "14"
     for num in range(1, 1000):
         assert r(str(num)) == str(num + 1)
+
+
+def test_solution12(r):
+    random.seed(0)
+    assert r("2+5") == "7"
+
+    # for lhs in range(1, 1000):
+    #     for rhs in range(1, 1000):
+    #         assert r(f"{lhs}+{rhs}") == str(
+    #             lhs + rhs
+    #         ), f"'{lhs}+{rhs}' should result in '{str(lhs + rhs)}'"
+
+    for _ in range(1000):
+        lhs = random.randint(1, 1000)
+        rhs = random.randint(1, 1000)
+        assert r(f"{lhs}+{rhs}") == str(
+            lhs + rhs
+        ), f"'{lhs}+{rhs}' should result in '{str(lhs + rhs)}'"
+
+    for _ in range(1000):
+        lhs = random.randint(1, 1_000_000_000)
+        rhs = random.randint(1, 1_000_000_000)
+        assert r(f"{lhs}+{rhs}") == str(
+            lhs + rhs
+        ), f"'{lhs}+{rhs}' should result in '{str(lhs + rhs)}'"
