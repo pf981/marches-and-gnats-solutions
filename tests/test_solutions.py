@@ -182,7 +182,7 @@ def test_solution12(r):
     for _ in range(1000):
         lhs = random.randint(1, 1000)
         rhs = random.randint(1, 1000)
-        assert r(f"{lhs}+{rhs}") == str(lhs + rhs) + "x"
+        assert r(f"{lhs}+{rhs}") == str(lhs + rhs)
 
         lhs = random.randint(1, 1_000_000_000)
         rhs = random.randint(1, 1_000_000_000)
