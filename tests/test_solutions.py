@@ -34,13 +34,22 @@ def r(request: pytest.FixtureRequest) -> typing.Callable[[str], str]:
     solution_number = int(match.group(1))
     transition_rules = get_transition_rules(solution_number)
 
+    class RunResult(str):
+        def __new__(cls, value: str, input_str: str):
+            obj = super().__new__(cls, value)
+            obj.input_str = input_str
+            return obj
+
+        def __repr__(self):
+            return f"<output={super().__repr__()} for input={self.input_str!r}>"
+
     def run(input: str) -> str:
         try:
             mill = logic_mill.LogicMill(transition_rules)
             result, _ = mill.run(input)
         except Exception as e:
             pytest.fail(f"Failed to run: {e}")
-        return result.strip("_")
+        return RunResult(result.strip("_"), input)
 
     return run
 
@@ -170,22 +179,11 @@ def test_solution12(r):
     random.seed(0)
     assert r("2+5") == "7"
 
-    # for lhs in range(1, 1000):
-    #     for rhs in range(1, 1000):
-    #         assert r(f"{lhs}+{rhs}") == str(
-    #             lhs + rhs
-    #         ), f"'{lhs}+{rhs}' should result in '{str(lhs + rhs)}'"
-
     for _ in range(1000):
         lhs = random.randint(1, 1000)
         rhs = random.randint(1, 1000)
-        assert r(f"{lhs}+{rhs}") == str(
-            lhs + rhs
-        ), f"'{lhs}+{rhs}' should result in '{str(lhs + rhs)}'"
+        assert r(f"{lhs}+{rhs}") == str(lhs + rhs) + "x"
 
-    for _ in range(1000):
         lhs = random.randint(1, 1_000_000_000)
         rhs = random.randint(1, 1_000_000_000)
-        assert r(f"{lhs}+{rhs}") == str(
-            lhs + rhs
-        ), f"'{lhs}+{rhs}' should result in '{str(lhs + rhs)}'"
+        assert r(f"{lhs}+{rhs}") == str(lhs + rhs)
