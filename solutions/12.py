@@ -51,9 +51,7 @@ def generate_code():
     # If RHS is + during pop, that means RHS is finished. Still need to shift across LHS and carry
     # Replace it with an _
     for carry in [0, 10]:
-        a(
-            f"POP_RHS_{carry} + POP_LHS_{carry//10} _ L"
-        )  # FIXME: Should I have carry//10?
+        a(f"POP_RHS_{carry} + POP_LHS_{carry//10} _ L")
 
         # If RHS is _ during pop, that means you already deleted the +
         a(f"POP_RHS_{carry} _ POP_LHS_{carry//10} _ L")
@@ -67,9 +65,6 @@ def generate_code():
     for carry in [0, 1]:
         a(f"SEEK_+_LEFT_{carry} + POP_LHS_{carry} + L")
         # Popping LHS defined higher above
-
-    # FIXME: Debug - simulator will complain if no halt
-    # a("HALT X HALT X L")
 
     # If you reach X, seek right
     #  - If you don't hit a +, then prepend
@@ -86,7 +81,7 @@ def generate_code():
     a("SHUFFLE_RHS_0 _ HALT _ R")
     a("SHUFFLE_RHS_1 _ HALT 1 R")
 
-    # TODO: Shift RHS to close the gap. Note that you start at the left side of RHS
+    # Shift RHS to close the gap. Note that you start at the left side of RHS
     for carry in [0, 1]:
         for num in range(10):
             a(f"SHUFFLE_RHS_{carry} {num} FIND_GAP_{carry} {num} R")
