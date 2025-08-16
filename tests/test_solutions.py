@@ -88,13 +88,19 @@ def test_codegen(solution_file):
     params = list(sig.parameters.keys())
     if params != ["r"]:
         pytest.fail(
-            f"Unable to run test for {solution_file} codegen. {test_func_name} test function does have correct parameters. Expected only 'r' parameter by signature was {sig}"
+            f"Unable to run test for {solution_file} codegen. {test_func_name} "
+            f"test function does not have correct parameters. "
+            f"Expected only 'r' parameter but signature was {sig}"
         )
 
     # Load the solution and build runner
     spec = importlib.util.spec_from_file_location(solution_file.stem, solution_file)
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
+
+    if not hasattr(module, "generate_code"):
+        pytest.fail(f"Module {solution_file} does not define generate_code()")
+
     code = module.generate_code()
     r = make_runner(code)
 
@@ -122,9 +128,9 @@ def test_solution2(r):
     assert r("|||||||") == "O"
     assert r("||||||") == "E"
     for num in range(1, 10):
-        assert (
-            r(tally(num)) == "EO"[num % 2]
-        ), f"Expect {num} is {['even', 'odd'][num % 2]}"
+        assert r(tally(num)) == "EO"[num % 2], (
+            f"Expect {num} is {['even', 'odd'][num % 2]}"
+        )
 
 
 def test_solution3(r):
