@@ -93,7 +93,7 @@ def test_codegen(solution_file):
     # Load the solution and build runner
     spec = importlib.util.spec_from_file_location(solution_file.stem, solution_file)
     module = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(module)  # type: ignore
+    spec.loader.exec_module(module)
     code = module.generate_code()
     r = make_runner(code)
 
