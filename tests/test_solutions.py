@@ -1,38 +1,23 @@
-import logic_mill
+import importlib
+import inspect
 import pathlib
 import pytest
 import random
 import re
+import sys
 import typing
 
+import logic_mill
 
-def get_transition_rules(solution_number: int) -> list[logic_mill.TransitionType]:
-    solution_file = pathlib.Path(f"solutions/{solution_number}.txt")
 
-    assert solution_file.exists(), f"Solution file {solution_file} does not exist"
+SOLUTIONS_DIR = pathlib.Path("solutions")
 
-    with open(solution_file, "r") as f:
-        code = f.read()
 
+def make_runner(code: str) -> typing.Callable[[str], str]:
     try:
         transition_rules = logic_mill.parse_transition_rules(code)
     except Exception as e:
-        pytest.fail(f"Failed to parse {solution_file}: {e}")
-
-    return transition_rules
-
-
-@pytest.fixture
-def r(request: pytest.FixtureRequest) -> typing.Callable[[str], str]:
-    """Auto runner fixture - short name for convenience"""
-    test_name = request.node.name
-    match = re.search(r"test_solution(\d+)", test_name)
-
-    if not match:
-        pytest.fail(f"Could not extract solution number from test name: {test_name}")
-
-    solution_number = int(match.group(1))
-    transition_rules = get_transition_rules(solution_number)
+        pytest.fail(f"Failed to parse code: {e}")
 
     class RunResult(str):
         input_str: str
@@ -54,6 +39,74 @@ def r(request: pytest.FixtureRequest) -> typing.Callable[[str], str]:
         return RunResult(result.strip("_"), input)
 
     return run
+
+
+@pytest.fixture
+def r(request: pytest.FixtureRequest) -> typing.Callable[[str], str]:
+    """Auto runner fixture - short name for convenience"""
+    test_name = request.node.name
+    match = re.search(r"test_solution(\d+)", test_name)
+
+    if not match:
+        pytest.fail(f"Could not extract solution number from test name: {test_name}")
+
+    solution_number = int(match.group(1))
+    solution_file = SOLUTIONS_DIR / f"{solution_number}.txt"
+
+    assert solution_file.exists(), f"Solution file {solution_file} does not exist"
+
+    with open(solution_file, "r") as f:
+        code = f.read()
+
+    try:
+        run = make_runner(code)
+    except Exception as e:
+        pytest.fail(f"Failed to build runner from {solution_file}: {e}")
+
+    return run
+
+
+# @pytest.fixture(params=sorted(SOLUTIONS_DIR.glob("*.py")))
+# def solution_module(request):
+#     """Provides each solutions/N.py as a module."""
+#     spec = importlib.util.spec_from_file_location(path.stem, path)
+#     module = importlib.util.module_from_spec(spec)
+#     spec.loader.exec_module(module)  # type: ignore
+#     return load_module(request.param)
+
+
+@pytest.mark.parametrize("solution_file", sorted(SOLUTIONS_DIR.glob("*.py")))
+def test_codegen(solution_file):
+    """For each solutions/N.py, run its matching test_solutionN(r)."""
+    if not solution_file.stem.isdigit():
+        pytest.fail(
+            f"Solution python module, '{solution_file}', does not have the correct format. Expected '{SOLUTIONS_DIR / '{solution_number}.py'}'"
+        )
+    solution_number = int(solution_file.stem)
+
+    # Find the corresponding test function in this module
+    test_func_name = f"test_solution{solution_number}"
+    current_module = sys.modules[__name__]
+    test_func = getattr(current_module, test_func_name, None)
+    if test_func is None:
+        pytest.fail(f"No {test_func_name} defined while processing {solution_file}")
+
+    # Load the solution and build runner
+    spec = importlib.util.spec_from_file_location(solution_file.stem, solution_file)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)  # type: ignore
+    code = module.generate_code()
+    r = make_runner(code)
+
+    # Call the test function, injecting r
+    sig = inspect.signature(test_func)
+    params = list(sig.parameters.keys())
+    if params != ["r"]:
+        pytest.fail(
+            f"Unable to run test for {solution_file} codegen. {test_func_name} test function does have correct parameters. Expected only 'r' parameter by signature was {sig}"
+        )
+
+    test_func(r)
 
 
 def tally(num: int) -> str:
