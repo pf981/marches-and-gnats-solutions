@@ -53,7 +53,8 @@ def r(request: pytest.FixtureRequest) -> typing.Callable[[str], str]:
     solution_number = int(match.group(1))
     solution_file = SOLUTIONS_DIR / f"{solution_number}.txt"
 
-    assert solution_file.exists(), f"Solution file {solution_file} does not exist"
+    if not solution_file.exists():
+        pytest.fail(f"Solution file {solution_file} does not exist")
 
     with open(solution_file, "r") as f:
         code = f.read()
