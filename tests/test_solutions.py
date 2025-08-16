@@ -67,11 +67,7 @@ def r(request: pytest.FixtureRequest) -> typing.Callable[[str], str]:
     return run
 
 
-@pytest.mark.parametrize(
-    "solution_file",
-    sorted(SOLUTIONS_DIR.glob("*.py")),
-    ids=lambda f: f"solution_file{f.stem}",
-)
+@pytest.mark.parametrize("solution_file", sorted(SOLUTIONS_DIR.glob("*.py")), ids=str)
 def test_codegen(solution_file):
     """For each solutions/N.py, run its matching test_solutionN(r)."""
     if not solution_file.stem.isdigit():
