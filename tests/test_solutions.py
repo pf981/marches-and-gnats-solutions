@@ -35,6 +35,8 @@ def r(request: pytest.FixtureRequest) -> typing.Callable[[str], str]:
     transition_rules = get_transition_rules(solution_number)
 
     class RunResult(str):
+        input_str: str
+
         def __new__(cls, value: str, input_str: str):
             obj = super().__new__(cls, value)
             obj.input_str = input_str
@@ -187,3 +189,16 @@ def test_solution12(r):
         lhs = random.randint(1, 1_000_000_000)
         rhs = random.randint(1, 1_000_000_000)
         assert r(f"{lhs}+{rhs}") == str(lhs + rhs)
+
+
+def test_solution13(r):
+    random.seed(0)
+    assert r("||,|,|||||,||||||||") == "|,||,|||||,||||||||"
+
+    for _ in range(100):
+        n = random.randint(1, 10)
+        nums = random.choices(range(1, 10), k=n)
+
+        input_str = ",".join(tally(num) for num in nums)
+        expected_output_str = ",".join(tally(num) for num in sorted(nums))
+        assert r(input_str) == expected_output_str
