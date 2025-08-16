@@ -66,15 +66,6 @@ def r(request: pytest.FixtureRequest) -> typing.Callable[[str], str]:
     return run
 
 
-# @pytest.fixture(params=sorted(SOLUTIONS_DIR.glob("*.py")))
-# def solution_module(request):
-#     """Provides each solutions/N.py as a module."""
-#     spec = importlib.util.spec_from_file_location(path.stem, path)
-#     module = importlib.util.module_from_spec(spec)
-#     spec.loader.exec_module(module)  # type: ignore
-#     return load_module(request.param)
-
-
 @pytest.mark.parametrize("solution_file", sorted(SOLUTIONS_DIR.glob("*.py")))
 def test_codegen(solution_file):
     """For each solutions/N.py, run its matching test_solutionN(r)."""
@@ -91,14 +82,7 @@ def test_codegen(solution_file):
     if test_func is None:
         pytest.fail(f"No {test_func_name} defined while processing {solution_file}")
 
-    # Load the solution and build runner
-    spec = importlib.util.spec_from_file_location(solution_file.stem, solution_file)
-    module = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(module)  # type: ignore
-    code = module.generate_code()
-    r = make_runner(code)
-
-    # Call the test function, injecting r
+    # Ensure test function takes correct parameters
     sig = inspect.signature(test_func)
     params = list(sig.parameters.keys())
     if params != ["r"]:
@@ -106,6 +90,14 @@ def test_codegen(solution_file):
             f"Unable to run test for {solution_file} codegen. {test_func_name} test function does have correct parameters. Expected only 'r' parameter by signature was {sig}"
         )
 
+    # Load the solution and build runner
+    spec = importlib.util.spec_from_file_location(solution_file.stem, solution_file)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)  # type: ignore
+    code = module.generate_code()
+    r = make_runner(code)
+
+    # Run the test
     test_func(r)
 
 
