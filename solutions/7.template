@@ -20,7 +20,6 @@ DUPE_CH                _                      WRITE_C     [            R
 WRITE_C                _                      WRITE_h     c            R
 WRITE_h                _                      WRITE_CLOSE h            R
 > INIT                 $chars
-< SEEK_START           $chars
 DUPE                   $chars_except_c        DUPE_${1}   _            R
 DUPE_${chars}          $chars_extra           DUPE_${1}   $2           R
 DUPE_${chars_except_w} _                      SEEK_START  $1           L
