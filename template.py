@@ -1,4 +1,6 @@
+import pathlib
 import re
+from typing import Literal
 
 import typer
 
@@ -26,7 +28,7 @@ def parse_line(line: str, replacements: dict[str, str]) -> list[str]:
             if len(used) < num:
                 raise ValueError(
                     f"Expected at least {num} template names due to template "
-                    f"reference number, {part:r}, but only encountered {len(used)}."
+                    f"reference number, {part!r}, but only encountered {len(used)}."
                 )
             return [used[num - 1] + rest for rest in get_rules(i + 1, used)]
 
@@ -45,9 +47,6 @@ def parse_line(line: str, replacements: dict[str, str]) -> list[str]:
     return get_rules(0, tuple())
 
 
-# get_rules(0, tuple())
-
-
 def parse(text: str) -> str:
     result = []
     replacements: dict[str, str] = {}
@@ -62,6 +61,11 @@ def parse(text: str) -> str:
         line = f"{state_in} {ch_in} {state_out} {ch_out} {direction}"
         result.extend(parse_line(line, replacements))
 
+    def move(state: str, ch: str, direction: Literal["R"] | Literal["L"]):
+        line = f"{state} {ch}"
+        for parsed in parse_line(line, replacements):
+            result.append(f"{parsed} {parsed} {direction}")
+
     for i, line in enumerate(text.splitlines(), 1):
         words = line.split("//", 1)[0].split()
 
@@ -73,9 +77,9 @@ def parse(text: str) -> str:
                     raise ValueError("{lhs} redefined on line {i}: {line!r}")
                 replacements[lhs] = rhs
             case [">", state, ch]:
-                add(state, ch, state, ch, "R")
+                move(state, ch, "R")
             case ["<", state, ch]:
-                add(state, ch, state, ch, "L")
+                move(state, ch, "L")
             case [state_in, ch_in, state_out, ch_out, direction]:
                 add(state_in, ch_in, state_out, ch_out, direction)
             case _:
@@ -85,11 +89,22 @@ def parse(text: str) -> str:
 
 
 def main(input_file: str, output_file: str = "AUTO") -> None:
-    with open(input_file, "r") as f:
-        text = f.read()
+    input_path = pathlib.Path(input_file)
+    text = input_path.read_text(encoding="utf-8")
 
     code = parse(text)
-    print(code)
+
+    if output_file != "AUTO" or input_path.suffix.lower() == ".txt":
+        print(code)
+        return
+
+    if output_file == "AUTO":
+        output_path = input_path.with_suffix(".txt")
+    else:
+        output_path = pathlib.Path(output_file)
+
+    print("Writing output to {output_path}.")
+    output_path.write_text(code, encoding="utf-8")
 
 
 if __name__ == "__main__":
