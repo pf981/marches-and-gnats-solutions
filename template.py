@@ -1,6 +1,6 @@
 import pathlib
 import re
-from typing import Literal
+from typing import Annotated, Literal
 
 import typer
 
@@ -74,7 +74,7 @@ def parse(text: str) -> str:
                 pass
             case [lhs, "=", rhs]:
                 if lhs in replacements:
-                    raise ValueError("{lhs} redefined on line {i}: {line!r}")
+                    raise ValueError(f"{lhs} redefined on line {i}: {line!r}")
                 replacements[lhs] = rhs
             case [">", state, ch]:
                 move(state, ch, "R")
@@ -83,27 +83,51 @@ def parse(text: str) -> str:
             case [state_in, ch_in, state_out, ch_out, direction]:
                 add(state_in, ch_in, state_out, ch_out, direction)
             case _:
-                raise ValueError("Unable to parse line {i}: {line!r}")
+                raise ValueError(f"Unable to parse line {i}: {line!r}")
 
     return "\n".join(result)
 
 
-def main(input_file: str, output_file: str = "AUTO") -> None:
-    input_path = pathlib.Path(input_file)
-    text = input_path.read_text(encoding="utf-8")
+def main(
+    input_file: Annotated[
+        pathlib.Path,
+        typer.Argument(
+            exists=True,
+            dir_okay=False,
+            readable=True,
+            help="Path to the input template file to parse.",
+        ),
+    ],
+    stdout: Annotated[
+        bool,
+        typer.Option(
+            "--stdout",
+            help="Print the output to stdout instead of writing to a file.",
+        ),
+    ] = False,
+) -> None:
+    """
+    Parse a template file and expand rules into plain text.
 
+    By default, the output is written to a new file next to the input with
+    the same name but a `.txt` extension. Use --stdout to print instead.
+    """
+    text = input_file.read_text(encoding="utf-8")
     code = parse(text)
 
-    if output_file != "AUTO" or input_path.suffix.lower() == ".txt":
+    if stdout:
         print(code)
         return
 
-    if output_file == "AUTO":
-        output_path = input_path.with_suffix(".txt")
-    else:
-        output_path = pathlib.Path(output_file)
+    output_path = input_file.with_suffix(".txt")
+    if output_path.resolve() == input_file.resolve():
+        raise ValueError(
+            f"Refusing to overwrite input file {input_file}. "
+            "Please choose --stdout instead or rename input "
+            "file to have '.template' extension."
+        )
 
-    print("Writing output to {output_path}.")
+    print(f"Writing output to {output_path}")
     output_path.write_text(code, encoding="utf-8")
 
 
