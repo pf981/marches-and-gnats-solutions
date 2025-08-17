@@ -1,0 +1,26 @@
+chars                = -abcdefghijklmnopqrstuvwxyzäöõü
+chars_except_c       = -abdefghijklmnopqrstuvwxyzäöõü
+chars_except_w       = -abcdefghijklmnopqrstuvxyzäöõü
+chars_extra          = -abcdefghijklmnopqrstuvwxyzäöõüX[]
+chars_extra_except_h = -abcdefgijklmnopqrstuvwxyzäöõüX[]
+
+INIT                   _                      SEEK_START  X            L
+< SEEK_START           $chars_extra
+SEEK_START             _                      DUPE        _            R
+DUPE                   X                      HALT        _            R
+DUPE_w                 _                      WRITE_W     [            R
+WRITE_W                _                      WRITE_CLOSE w            R
+WRITE_CLOSE            _                      SEEK_START  ]            L
+DUPE                   c                      DUPE_C1     _            R
+DUPE_C1                h                      DUPE_CH     _            R
+DUPE_C1                _                      SEEK_START  C            L
+DUPE_CH                $chars_extra           DUPE_CH     $1           R
+DUPE_C1                $chars_extra_except_h  DUPE_c      $1           R
+DUPE_CH                _                      WRITE_C     [            R
+WRITE_C                _                      WRITE_h     c            R
+WRITE_h                _                      WRITE_CLOSE h            R
+> INIT                 $chars
+< SEEK_START           $chars
+DUPE                   $chars_except_c        DUPE_${1}   _            R
+DUPE_${chars}          $chars_extra           DUPE_${1}   $2           R
+DUPE_${chars_except_w} _                      SEEK_START  $1           L
