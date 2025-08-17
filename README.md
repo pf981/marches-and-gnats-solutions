@@ -21,11 +21,10 @@ Some transition rules are more easily expressed using a **template language**. T
 
 ### Running the translator
 
-To convert a `.template` file into a `.txt` file of template rules:
-
-```bash
-uv run template.py solutions/7.template
-````
+Convert all `.template` files to `.txt` with:
+```
+uv run template.py solutions/*.template
+```
 
 By default, this will write to a file with the same name but with the `.txt` extension (e.g. `solutions/7.txt`). If you want to force output to standard output instead of a file, use the `--stdout` flag:
 
