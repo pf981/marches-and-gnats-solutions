@@ -1,0 +1,11 @@
+alphabet = -abcdefghijklmnopqrstuvwxyzäöõü
+
+PROCESS_RIGHT  +  SEEK_LEFT  _  L
+SEEK_LEFT      _  SEEK_LEFT  _  L
+SEEK_LEFT      |  APPEND     |  R
+APPEND         _  SEEK_RIGHT |  R
+SEEK_RIGHT     _  SEEK_RIGHT _  R
+PROCESS_RIGHT  _  HALT       _  R
+INIT           $alphabet  PROCESS_RIGHT  |  R
+PROCESS_RIGHT  $alphabet  PROCESS_RIGHT  _  R
+SEEK_RIGHT     $alphabet  PROCESS_RIGHT  _  R
