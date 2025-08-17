@@ -89,13 +89,13 @@ def parse(text: str) -> str:
 
 
 def main(
-    input_file: Annotated[
-        pathlib.Path,
+    input_files: Annotated[
+        list[pathlib.Path],
         typer.Argument(
             exists=True,
             dir_okay=False,
             readable=True,
-            help="Path to the input template file to parse.",
+            help="One or more template files to parse.",
         ),
     ],
     stdout: Annotated[
@@ -112,23 +112,24 @@ def main(
     By default, the output is written to a new file next to the input with
     the same name but a `.txt` extension. Use --stdout to print instead.
     """
-    text = input_file.read_text(encoding="utf-8")
-    code = parse(text)
+    for input_file in input_files:
+        text = input_file.read_text(encoding="utf-8")
+        code = parse(text)
 
-    if stdout:
-        print(code)
-        return
+        if stdout:
+            print(code)
+            return
 
-    output_path = input_file.with_suffix(".txt")
-    if output_path.resolve() == input_file.resolve():
-        raise ValueError(
-            f"Refusing to overwrite input file {input_file}. "
-            "Please choose --stdout instead or rename input "
-            "file to have '.template' extension."
-        )
+        output_path = input_file.with_suffix(".txt")
+        if output_path.resolve() == input_file.resolve():
+            raise ValueError(
+                f"Refusing to overwrite input file {input_file}. "
+                "Please choose --stdout instead or rename input "
+                "file to have '.template' extension."
+            )
 
-    print(f"Writing output to {output_path}")
-    output_path.write_text(code, encoding="utf-8")
+        print(f"Writing output to {output_path}")
+        output_path.write_text(code, encoding="utf-8")
 
 
 if __name__ == "__main__":
