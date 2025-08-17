@@ -19,5 +19,5 @@ def generate_code():
 
 if __name__ == "__main__":
     code = generate_code()
-    with open("solutions/10.txt", "w") as f:
+    with open("solutions/10.txt", "w", encoding="utf-8") as f:
         f.write(code)

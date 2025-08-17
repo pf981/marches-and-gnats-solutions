@@ -51,10 +51,10 @@ def generate_code():
     # If RHS is + during pop, that means RHS is finished. Still need to shift across LHS and carry
     # Replace it with an _
     for carry in [0, 10]:
-        a(f"POP_RHS_{carry} + POP_LHS_{carry//10} _ L")
+        a(f"POP_RHS_{carry} + POP_LHS_{carry // 10} _ L")
 
         # If RHS is _ during pop, that means you already deleted the +
-        a(f"POP_RHS_{carry} _ POP_LHS_{carry//10} _ L")
+        a(f"POP_RHS_{carry} _ POP_LHS_{carry // 10} _ L")
 
     # Note carry is 0 or 1
     for carry in [0, 1]:
@@ -114,5 +114,5 @@ def generate_code():
 
 if __name__ == "__main__":
     code = generate_code()
-    with open("solutions/12.txt", "w") as f:
+    with open("solutions/12.txt", "w", encoding="utf-8") as f:
         f.write(code)

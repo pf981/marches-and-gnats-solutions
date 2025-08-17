@@ -67,7 +67,7 @@ def r(request: pytest.FixtureRequest) -> typing.Callable[[str], str]:
     return run
 
 
-@pytest.mark.parametrize("solution_file", sorted(SOLUTIONS_DIR.glob("*.py")))
+@pytest.mark.parametrize("solution_file", sorted(SOLUTIONS_DIR.glob("*.py")), ids=str)
 def test_codegen(solution_file):
     """For each solutions/N.py, run its matching test_solutionN(r)."""
     if not solution_file.stem.isdigit():
@@ -88,13 +88,31 @@ def test_codegen(solution_file):
     params = list(sig.parameters.keys())
     if params != ["r"]:
         pytest.fail(
-            f"Unable to run test for {solution_file} codegen. {test_func_name} test function does have correct parameters. Expected only 'r' parameter by signature was {sig}"
+            f"Unable to run test for {solution_file} codegen. {test_func_name} "
+            f"test function does not have correct parameters. "
+            f"Expected only 'r' parameter but signature was {sig}"
         )
 
     # Load the solution and build runner
     spec = importlib.util.spec_from_file_location(solution_file.stem, solution_file)
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
+
+    # Ensure generate_code exists, is callable, and has no arguments
+    if not hasattr(module, "generate_code"):
+        pytest.fail(f"Module {solution_file} does not define generate_code()")
+
+    generate_code = getattr(module, "generate_code")
+    if not callable(generate_code):
+        pytest.fail(f"generate_code in {solution_file} is not callable")
+
+    gen_sig = inspect.signature(generate_code)
+    if len(gen_sig.parameters) != 0:
+        pytest.fail(
+            f"generate_code in {solution_file} must take no arguments, "
+            f"but signature was {gen_sig}"
+        )
+
     code = module.generate_code()
     r = make_runner(code)
 
@@ -122,9 +140,9 @@ def test_solution2(r):
     assert r("|||||||") == "O"
     assert r("||||||") == "E"
     for num in range(1, 10):
-        assert (
-            r(tally(num)) == "EO"[num % 2]
-        ), f"Expect {num} is {['even', 'odd'][num % 2]}"
+        assert r(tally(num)) == "EO"[num % 2], (
+            f"Expect {num} is {['even', 'odd'][num % 2]}"
+        )
 
 
 def test_solution3(r):
