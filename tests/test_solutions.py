@@ -56,7 +56,7 @@ def r(request: pytest.FixtureRequest) -> typing.Callable[[str], str]:
     if not solution_file.exists():
         pytest.fail(f"Solution file {solution_file} does not exist")
 
-    with open(solution_file, "r") as f:
+    with open(solution_file, "r", encoding="utf-8") as f:
         code = f.read()
 
     try:
@@ -140,9 +140,9 @@ def test_solution2(r):
     assert r("|||||||") == "O"
     assert r("||||||") == "E"
     for num in range(1, 10):
-        assert r(tally(num)) == "EO"[num % 2], (
-            f"Expect {num} is {['even', 'odd'][num % 2]}"
-        )
+        assert (
+            r(tally(num)) == "EO"[num % 2]
+        ), f"Expect {num} is {['even', 'odd'][num % 2]}"
 
 
 def test_solution3(r):
