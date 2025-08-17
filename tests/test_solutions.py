@@ -8,7 +8,7 @@ import sys
 import typing
 
 import logic_mill
-
+import template
 
 SOLUTIONS_DIR = pathlib.Path("solutions")
 
@@ -67,9 +67,17 @@ def r(request: pytest.FixtureRequest) -> typing.Callable[[str], str]:
     return run
 
 
-@pytest.mark.parametrize("solution_file", sorted(SOLUTIONS_DIR.glob("*.py")), ids=str)
+@pytest.mark.parametrize(
+    "solution_file",
+    sorted(SOLUTIONS_DIR.glob("*.py")),
+    ids=lambda path: path.as_posix(),
+)
 def test_codegen(solution_file):
-    """For each solutions/N.py, run its matching test_solutionN(r)."""
+    """
+    For each solutions/N.py, run its matching test_solutionN(r).
+
+    Requires each Python file to define a `generate_code()` function.
+    """
     if not solution_file.stem.isdigit():
         pytest.fail(
             f"Solution python module, '{solution_file}', does not have the correct format. Expected '{SOLUTIONS_DIR / '{solution_number}.py'}'"
@@ -114,6 +122,49 @@ def test_codegen(solution_file):
         )
 
     code = module.generate_code()
+    r = make_runner(code)
+
+    # Run the test
+    test_func(r)
+
+
+@pytest.mark.parametrize(
+    "template_file",
+    sorted(SOLUTIONS_DIR.glob("*.template")),
+    ids=lambda path: path.as_posix(),
+)
+def test_templates(template_file):
+    """
+    For each solutions/N.template, translate it to transition rules and run
+    its matching test_solutionN(r).
+    """
+    if not template_file.stem.isdigit():
+        pytest.fail(
+            f"Template, '{template_file}', does not have correct file name format. Expected '{SOLUTIONS_DIR / '{solution_number}.template'}'"
+        )
+    solution_number = int(template_file.stem)
+
+    # Find the corresponding test function in this module
+    test_func_name = f"test_solution{solution_number}"
+    current_module = sys.modules[__name__]
+    test_func = getattr(current_module, test_func_name, None)
+    if test_func is None:
+        pytest.fail(f"No {test_func_name} defined while processing {template_file}")
+
+    # Ensure test function takes correct parameters
+    sig = inspect.signature(test_func)
+    params = list(sig.parameters.keys())
+    if params != ["r"]:
+        pytest.fail(
+            f"Unable to run test for {template_file} codegen. {test_func_name} "
+            f"test function does not have correct parameters. "
+            f"Expected only 'r' parameter but signature was {sig}"
+        )
+
+    with open(template_file, "r", encoding="utf-8") as f:
+        template_code = f.read()
+
+    code = template.parse(template_code)
     r = make_runner(code)
 
     # Run the test
